@@ -90,7 +90,7 @@ img:hover {
     padding: 0 10px;
 }
 
-@media (max-width: 650px) {
+@media (max-width: 768px) {
     body {
         padding: 10px;
     }
