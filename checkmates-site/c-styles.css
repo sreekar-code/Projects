@@ -32,6 +32,13 @@ h1::before, h1::after {
     color: #8b6b4a;
 }
 
+.play-button {
+   position: fixed;
+   top: 20px;
+   right: 30px;
+   z-index: 100;
+}
+
 .play-button a {
     text-align: right;
    display: inline-block;
