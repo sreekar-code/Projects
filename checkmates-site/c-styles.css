@@ -14,26 +14,28 @@ body {
 }
 
 .play-button {
-    text-align: center;
-    margin: 20px 0;
+    position: absolute;
+    top: 20px;
+    right: 40px;
 }
 
 .play-button a {
     display: inline-block;
-    padding: 12px 30px;
-    background-color: #8b6b4a;
+    padding: 10px 25px;
+    background-color: #b69677;
     color: white;
     text-decoration: none;
-    border-radius: 25px;
-    font-size: 1.1em;
+    border-radius: 20px;
+    font-size: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    font-weight: 500;
 }
 
 .play-button a:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    background-color: #7a5c3e;
+    background-color: #a58567;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.12);
 }
 
 h1 {
