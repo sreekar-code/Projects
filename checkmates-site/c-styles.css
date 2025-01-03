@@ -13,6 +13,29 @@ body {
     font-family: 'Georgia', serif;
 }
 
+.play-button {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.play-button a {
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: #8b6b4a;
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.play-button a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    background-color: #7a5c3e;
+}
+
 h1 {
     color: #4a4a4a;
     text-align: center;
