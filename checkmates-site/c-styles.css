@@ -103,22 +103,23 @@ img:hover {
         padding: 20px;
         width: 90%;
     }
-    
-    /* Reorder items on mobile */
-    .gallery:nth-of-type(1) .gallery-item:nth-child(2) {
+
+    .gallery .gallery-item:nth-child(2) {
         display: none;
     }
-    
-    .gallery:nth-of-type(2) .gallery-item:nth-child(1) {
+
+    .gallery:nth-child(2) .gallery-item:nth-child(1) {
         display: none;
     }
-    
-    .gallery:nth-of-type(2) .gallery-item:nth-child(2) {
+    .gallery:nth-child(2) .gallery-item:nth-child(2) {
         display: block;
     }
-    
-    .gallery:nth-of-type(3) .gallery-item:nth-child(1) {
+
+    .gallery:nth-child(3) .gallery-item:nth-child(1) {
         display: none;
+    }
+    .gallery:nth-child(3) .gallery-item:nth-child(2) {
+        display: block;
     }
     
     img {
