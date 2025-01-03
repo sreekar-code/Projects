@@ -13,29 +13,6 @@ body {
     font-family: 'Georgia', serif;
 }
 
-/* Reset center alignment for h1 */
-h1 {
-   margin: 20px auto 30px;
-   text-align: center;
-}
-
-.play-button {
-   position: absolute;
-   top: 25px;
-   right: 30px;
-}
-
-.play-button a {
-   padding: 8px 20px;
-   background-color: rgba(182, 150, 119, 0.8); 
-   color: white;
-   font-size: 0.9rem;
-   text-decoration: none;
-   border-radius: 15px;
-   transition: all 0.2s ease;
-}
-
-
 h1 {
     color: #4a4a4a;
     text-align: center;
@@ -140,13 +117,4 @@ h1 {
        padding: 0 50px;
    }
 
-   .play-button {
-       top: 15px;
-       right: 15px;
-   }
-   
-   .play-button a {
-       padding: 6px 15px;
-       font-size: 0.8rem;
-   }
 }
