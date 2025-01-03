@@ -1,0 +1,47 @@
+html {
+  max-width: 70ch;
+  padding: 2em 1em;
+  margin: auto;
+  line-height: 1.75;
+  font-size: 1.25em;
+}
+.blogtitle {font-size: 2em; font-weight: bold;}
+.date {font-style: italic;}
+a {color: black;}
+hr {margin-bottom: 10px;}
+blockquote {
+  padding-left: 20px;
+  margin: 20px 0;
+  font-style: italic;
+  border-left: 5px solid #6F6D6D;
+}
+ img {
+   max-width: 100%;
+   display: block;
+   margin: 0 auto;
+   max-height: 75vh;
+   border-radius: 12px;
+   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+ }
+
+.like-button-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.like-button {
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+
+/* mobile */
+@media (max-width: 768px) {
+   html {font-size: 1em;}
+   .site-footer {text-align: center;}
+   }
