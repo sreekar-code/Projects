@@ -21,17 +21,20 @@ h1 {
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     padding: 0 10px;
     line-height: 1.2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
 }
 
 h1::before, h1::after {
     content: "♔";
-    margin: 0 15px;
     color: #8b6b4a;
 }
 
 .gallery {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 40px;
     justify-content: center;
     width: 95%;
@@ -102,9 +105,8 @@ img:hover {
         width: 90%;
     }
     
-    h1::before, h1::after {
-        display: block;
-        margin: 10px auto;
+    .gallery-item:nth-child(2) {
+        display: none;
     }
 
     img {
