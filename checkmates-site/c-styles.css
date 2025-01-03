@@ -104,15 +104,27 @@ img:hover {
         width: 90%;
     }
     
-    /* Hide second item in each gallery on mobile */
-    .gallery .gallery-item:nth-child(2) {
+    /* Reorder items on mobile */
+    .gallery:nth-of-type(1) .gallery-item:nth-child(2) {
         display: none;
     }
-
+    
+    .gallery:nth-of-type(2) .gallery-item:nth-child(1) {
+        display: none;
+    }
+    
+    .gallery:nth-of-type(2) .gallery-item:nth-child(2) {
+        display: block;
+    }
+    
+    .gallery:nth-of-type(3) .gallery-item:nth-child(1) {
+        display: none;
+    }
+    
     img {
         max-width: 100%;
     }
-
+    
     .description {
         font-size: 0.9em;
     }
