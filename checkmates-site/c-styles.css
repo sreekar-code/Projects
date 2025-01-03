@@ -34,7 +34,7 @@ h1::before, h1::after {
 
 .play-button {
    top: 20px;
-   right: 30px;
+   left: 30px;
    z-index: 100;
 }
 
