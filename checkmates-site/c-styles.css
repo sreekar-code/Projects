@@ -13,28 +13,26 @@ body {
     font-family: 'Georgia', serif;
 }
 
-.header-container {
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
-   max-width: 1200px;
-   margin: 0 auto;
-   padding: 0 30px;
+/* Reset center alignment for h1 */
+h1 {
+   margin: 20px auto 30px;
+   text-align: center;
+}
+
+.play-button {
+   position: absolute;
+   top: 25px;
+   right: 30px;
 }
 
 .play-button a {
-   display: inline-block;
    padding: 8px 20px;
-   background-color: rgba(182, 150, 119, 0.8);
+   background-color: rgba(182, 150, 119, 0.8); 
    color: white;
+   font-size: 0.9rem;
    text-decoration: none;
    border-radius: 15px;
-   font-size: 0.9rem;
    transition: all 0.2s ease;
-}
-
-.play-button a:hover {
-   background-color: rgba(182, 150, 119, 0.9);
 }
 
 
@@ -136,19 +134,19 @@ img:hover {
         padding: 30px;
     }
 
-    .play-button {
-       top: 10px;
-       right: 15px;
+h1 { 
+       font-size: 1.8rem;
+       margin: 15px auto 25px;
+       padding: 0 50px;
    }
-   
-   .header-container {
-       flex-direction: column;
-       gap: 15px;
-       padding: 0 15px;
+
+   .play-button {
+       top: 15px;
+       right: 15px;
    }
    
    .play-button a {
        padding: 6px 15px;
-       font-size: 0.85rem;
+       font-size: 0.8rem;
    }
 }
