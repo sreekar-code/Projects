@@ -46,7 +46,7 @@ h1::before, h1::after {
    color: white;
    text-decoration: none;
    border-radius: 15px;
-   font-size: 0.9rem;
+   font-size: 0.5rem;
    transition: all 0.2s ease;
    backdrop-filter: blur(5px);
 }
