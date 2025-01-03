@@ -33,7 +33,7 @@ h1::before, h1::after {
 }
 
 .play-button {
-   position: float;
+   position: fixed;
    top: 20px;
    right: 30px;
    z-index: 100;
