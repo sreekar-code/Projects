@@ -40,7 +40,6 @@ h1::before, h1::after {
 }
 
 .play-button a {
-    text-align: right;
    display: inline-block;
    padding: 8px 20px;
    background-color: rgba(182, 150, 119, 0.8);
