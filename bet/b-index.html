@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bet on my Tweet!</title>
+    <style>
+        /* Previous styles remain the same */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #1DA1F2;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            color: #2C3E50;
+        }
+        
+        .tweet-link {
+            color: #1DA1F2;
+            text-decoration: none;
+        }
+        
+        .tweet-link:hover {
+            text-decoration: underline;
+        }
+        
+        .input-field {
+            width: 200px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #1DA1F2;
+            border-radius: 5px;
+            margin: 10px;
+        }
+        
+        .submit-btn {
+            background-color: #1DA1F2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.2s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #1a91da;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #e8f5fe;
+            color: #1DA1F2;
+            display: none;
+        }
+        
+        .bets-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            background: white;
+        }
+        
+        .bets-table th, .bets-table td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .bets-table th {
+            background-color: #e9ecef;
+            color: #1DA1F2;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 15px;
+            color: #1DA1F2;
+            font-style: italic;
+            border-top: 1px solid #e1e8ed;
+            margin-top: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bet on my Tweet!</h1>
+        
+        <div class="instructions">
+            Welcome to a fun Twitter prediction game! Here's how it works:
+            <br><br>
+            1. Each day, I share one of my tweets here
+            <br>
+            2. Take your best guess at how many likes it'll get in 24 hours
+            <br>
+            3. Enter your name and prediction below
+            <br>
+            4. Check back tomorrow to see if you won!
+            <br><br>
+            The person who gets closest to the actual number of likes wins. Ready to test your Twitter intuition?
+        </div>
+        
+        <h2>My Tweet: <a href="#" class="tweet-link" id="tweetLink" target="_blank" rel="noopener noreferrer">Loading today's tweet...</a></h2>
+        
+        <div class="input-group">
+            <input type="text" class="input-field" id="nameInput" placeholder="Enter your name" required>
+            <input type="number" class="input-field" id="betInput" placeholder="Number of likes" min="0" required>
+            <button class="submit-btn" onclick="submitBet()">Submit Bet</button>
+        </div>
+        
+        <div class="message" id="message"></div>
+        
+        <h2>Current Bets</h2>
+        <table class="bets-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Bet</th>
+                </tr>
+            </thead>
+            <tbody id="betsTableBody">
+                <tr>
+                    <td colspan="2" class="loading">Loading bets...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="status-message">
+            Tweet went live at 1:35 PM IST. Winner will be announced after 24 hours. Stay tuned!
+        </div>
+    </div>
+
+    <script>
+        // Replace these with your own JSONBin.io bin IDs and API key
+        const JSONBIN_BIN_ID = '677b8f69acd3cb34a8c4d513';
+        const JSONBIN_API_KEY = '$2a$10$wcos.3S9pfwCP.yv/d/WgumoqaqGYGjX.iVHoZU2uuC0GnTONhEE2';
+        const CURRENT_TWEET_LINK = 'https://x.com/sreekar_writer/status/1876178250948620667';
+        
+        let currentData = {
+            tweetLink: CURRENT_TWEET_LINK,
+            bets: []
+        };
+
+        // Function to fetch data from JSONBin
+        async function fetchData() {
+            try {
+                const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                    headers: {
+                        'X-Master-Key': JSONBIN_API_KEY
+                    }
+                });
+                const data = await response.json();
+                return data.record;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return null;
+            }
+        }
+
+        // Function to update data in JSONBin
+        async function updateData(data) {
+            try {
+                await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_API_KEY
+                    },
+                    body: JSON.stringify(data)
+                });
+                return true;
+            } catch (error) {
+                console.error('Error updating data:', error);
+                return false;
+            }
+        }
+
+        // Initialize and load data
+        async function initialize() {
+            const data = await fetchData();
+            
+            if (data && data.tweetLink === CURRENT_TWEET_LINK) {
+                currentData = data;
+            } else {
+                // Reset data if tweet link has changed
+                currentData = {
+                    tweetLink: CURRENT_TWEET_LINK,
+                    bets: []
+                };
+                await updateData(currentData);
+            }
+            
+            document.getElementById('tweetLink').href = currentData.tweetLink;
+            document.getElementById('tweetLink').textContent = currentData.tweetLink;
+            loadBets();
+        }
+
+        // Load bets into table
+        function loadBets() {
+            const tbody = document.getElementById('betsTableBody');
+            tbody.innerHTML = '';
+            
+            currentData.bets.forEach(bet => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = bet.name;
+                row.insertCell(1).textContent = bet.prediction;
+            });
+        }
+
+        // Submit bet
+        async function submitBet() {
+            const nameInput = document.getElementById('nameInput');
+            const betInput = document.getElementById('betInput');
+            const name = nameInput.value.trim();
+            const prediction = parseInt(betInput.value);
+            
+            if (!name) {
+                showMessage("Please enter your name", "error");
+                return;
+            }
+            
+            if (isNaN(prediction) || prediction < 0) {
+                showMessage("Please enter a valid number of likes", "error");
+                return;
+            }
+
+            // Refresh data before adding new bet
+            const freshData = await fetchData();
+            if (freshData && freshData.tweetLink === CURRENT_TWEET_LINK) {
+                currentData = freshData;
+            }
+            
+            currentData.bets.push({
+                name: name,
+                prediction: prediction,
+                timestamp: Date.now()
+            });
+            
+            if (await updateData(currentData)) {
+                nameInput.value = "";
+                betInput.value = "";
+                showMessage("Your bet has been recorded!", "success");
+                loadBets();
+            } else {
+                showMessage("Error saving your bet. Please try again.", "error");
+            }
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+            
+            switch(type) {
+                case 'error':
+                    messageDiv.style.backgroundColor = '#ffebee';
+                    messageDiv.style.color = '#c62828';
+                    break;
+                case 'success':
+                    messageDiv.style.backgroundColor = '#e8f5e9';
+                    messageDiv.style.color = '#2e7d32';
+                    break;
+            }
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Initialize on load
+        window.onload = initialize;
+
+        // Refresh data periodically
+        setInterval(async () => {
+            const data = await fetchData();
+            if (data && data.tweetLink === CURRENT_TWEET_LINK) {
+                currentData = data;
+                loadBets();
+            } else {
+                initialize();
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
