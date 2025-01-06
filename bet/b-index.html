@@ -43,13 +43,40 @@
             color: #2C3E50;
             font-size: 14px;
         }
+
+        .tweet-container {
+            background: #f8f9fa;
+            border: 1px solid #e1e8ed;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .tweet-label {
+            color: #536471;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
         
         .tweet-link {
             color: #1DA1F2;
             text-decoration: none;
-            word-break: break-all;
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 12px;
             display: block;
             font-size: 14px;
+            line-height: 1.4;
+            word-break: break-word;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        
+        .tweet-link:hover {
+            background-color: #f7f9f9;
+            border-color: #ccd6dd;
+            text-decoration: none;
         }
         
         .input-group {
@@ -133,7 +160,26 @@
             font-size: 14px;
         }
 
-        /* Media Queries */
+        /* Mobile Optimizations */
+        @media screen and (max-width: 480px) {
+            .tweet-link {
+                font-size: 13px;
+                padding: 10px;
+            }
+
+            .bets-table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -15px;
+                padding: 0 15px;
+            }
+
+            .bets-table {
+                min-width: 280px;
+            }
+        }
+
+        /* Desktop Optimizations */
         @media screen and (min-width: 768px) {
             body {
                 padding: 20px;
@@ -167,7 +213,7 @@
                 font-size: 24px;
             }
 
-            .instructions, .tweet-link, .message, .bets-table, .status-message {
+            .instructions, .message, .bets-table, .status-message {
                 font-size: 16px;
             }
         }
@@ -177,20 +223,6 @@
             input[type="text"],
             input[type="number"] {
                 font-size: 16px;
-            }
-        }
-
-        /* Fix for mobile table scrolling */
-        @media screen and (max-width: 480px) {
-            .bets-table-wrapper {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                margin: 0 -15px;
-                padding: 0 15px;
-            }
-
-            .bets-table {
-                min-width: 280px;
             }
         }
     </style>
@@ -213,8 +245,10 @@
             The person who gets closest to the actual number of likes wins. Ready to test your Twitter intuition?
         </div>
         
-        <h2>My Tweet:</h2>
-        <a href="#" class="tweet-link" id="tweetLink" target="_blank" rel="noopener noreferrer">Loading today's tweet...</a>
+        <div class="tweet-container">
+            <div class="tweet-label">Today's Tweet</div>
+            <a href="#" class="tweet-link" id="tweetLink" target="_blank" rel="noopener noreferrer">Loading today's tweet...</a>
+        </div>
         
         <div class="input-group">
             <input type="text" class="input-field" id="nameInput" placeholder="Enter your name" required>
@@ -247,7 +281,6 @@
     </div>
 
     <script>
-        // JavaScript remains unchanged
         const JSONBIN_BIN_ID = '677b8f69acd3cb34a8c4d513';
         const JSONBIN_API_KEY = '$2a$10$wcos.3S9pfwCP.yv/d/WgumoqaqGYGjX.iVHoZU2uuC0GnTONhEE2';
         const CURRENT_TWEET_LINK = 'https://x.com/sreekar_writer/status/1876178250948620667';
