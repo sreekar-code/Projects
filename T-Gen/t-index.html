@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T-Shirt Size Chart Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .measurement-inputs {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .measurement-inputs {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            body {
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 900px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            color: #34495e;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+        }
+
+        button {
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+            width: 100%;
+            max-width: 200px;
+            margin: 10px auto;
+            display: block;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 10px 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .copy-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Specific button styles */
+        #generateButton {
+            background: #3498db;
+        }
+
+        #generateButton:hover {
+            background: #2980b9;
+        }
+
+        #copyButton {
+            background: #2ecc71;
+        }
+
+        #copyButton:hover {
+            background: #27ae60;
+        }
+
+        /* Add touch-friendly tap targets */
+        button, input {
+            min-height: 44px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>T-Shirt Size Chart Generator</h1>
+        
+        <div class="input-section">
+            <h2>Enter Measurements (in cm)</h2>
+            <div class="measurement-inputs">
+                <div class="input-group">
+                    <label for="chest-s">Chest (S)</label>
+                    <input type="number" id="chest-s" value="91.5" step="0.5">
+                </div>
+                <div class="input-group">
+                    <label for="chest-m">Chest (M)</label>
+                    <input type="number" id="chest-m" value="96.5" step="0.5">
+                </div>
+                <div class="input-group">
+                    <label for="chest-l">Chest (L)</label>
+                    <input type="number" id="chest-l" value="101.5" step="0.5">
+                </div>
+                <div class="input-group">
+                    <label for="chest-xl">Chest (XL)</label>
+                    <input type="number" id="chest-xl" value="106.5" step="0.5">
+                </div>
+            </div>
+            <div class="measurement-inputs">
+                <div class="input-group">
+                    <label for="length-s">Length (S)</label>
+                    <input type="number" id="length-s" value="68.5" step="0.5">
+                </div>
+                <div class="input-group">
+                    <label for="length-m">Length (M)</label>
+                    <input type="number" id="length-m" value="71" step="0.5">
+                </div>
+                <div class="input-group">
+                    <label for="length-l">Length (L)</label>
+                    <input type="number" id="length-l" value="73.5" step="0.5">
+                </div>
+                <div class="input-group">
+                    <label for="length-xl">Length (XL)</label>
+                    <input type="number" id="length-xl" value="76" step="0.5">
+                </div>
+            </div>
+            <button id="generateButton" onclick="generateChart()">Generate Size Chart</button>
+        </div>
+
+        <div id="chartOutput"></div>
+        
+        <div class="copy-section">
+            <button id="copyButton" onclick="copyHTML()">Copy HTML</button>
+        </div>
+    </div>
+
+    <script>
+        function generateChart() {
+            const sizes = ['S', 'M', 'L', 'XL'];
+            let tableHTML = `
+                <table>
+                    <tr>
+                        <th>Size</th>
+                        <th>Chest (cm)</th>
+                        <th>Length (cm)</th>
+                    </tr>
+            `;
+
+            sizes.forEach(size => {
+                const chest = document.getElementById(`chest-${size.toLowerCase()}`).value;
+                const length = document.getElementById(`length-${size.toLowerCase()}`).value;
+                
+                tableHTML += `
+                    <tr>
+                        <td>${size}</td>
+                        <td>${chest}</td>
+                        <td>${length}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += '</table>';
+            document.getElementById('chartOutput').innerHTML = tableHTML;
+        }
+
+        function copyHTML() {
+            const chartHTML = document.getElementById('chartOutput').innerHTML;
+            navigator.clipboard.writeText(chartHTML).then(() => {
+                const copyBtn = document.getElementById('copyButton');
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy HTML';
+                }, 2000);
+            });
+        }
+
+        // Generate chart on page load
+        generateChart();
+    </script>
+</body>
+</html>
