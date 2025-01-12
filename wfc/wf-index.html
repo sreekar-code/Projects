@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work From Cafe/Hyderabad</title>
+    <style>
+        :root {
+            --primary-color: #6F4E37;
+            --secondary-color: #C4A484;
+            --background-color: #FDF5E6;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="3" fill="%236F4E37" opacity="0.1"/></svg>');
+        }
+
+
+        /* Updated explanation style */
+        .explanation {
+            text-align: left;
+            color: var(--primary-color);
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+
+        .explanation ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        .explanation li {
+            margin-bottom: 12px;
+        }
+
+        .note {
+            font-size: 0.9em;
+            margin-top: 15px;
+            padding-left: 20px;
+            font-style: italic;
+        }
+
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .add-cafe-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
+        }
+
+        .add-cafe-btn:hover {
+            background-color: #5D4037;
+        }
+
+        /* New styles for the bottom add button */
+        .bottom-add-btn {
+            display: inline-block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 25px;
+            background-color: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .bottom-add-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(111, 78, 55, 0.2);
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .cafe-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .cafe-item {
+            background-color: white;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cafe-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .cafe-name {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .cafe-rating {
+            color: var(--secondary-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 20px;
+            max-width: 500px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--primary-color);
+        }
+
+        .rating-group {
+            margin: 15px 0;
+        }
+
+        .rating-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+
+        .stars {
+            color: #FFD700;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .stars span {
+            margin-right: 5px;
+        }
+
+        .stars span:hover ~ span {
+            color: #ddd;
+        }
+
+
+/* Mobile-first responsive design */
+.container {
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+header {
+    padding: 10px;
+}
+
+h1 {
+    font-size: 1.8em;
+    word-wrap: break-word;
+}
+
+.explanation {
+    font-size: 1em;
+    padding: 0 10px;
+}
+
+.explanation ul {
+    padding-left: 15px;
+}
+
+.cafe-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+}
+
+.modal-content {
+    margin: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 15px;
+    width: auto;
+}
+
+.rating-group {
+    margin: 12px 0;
+}
+
+.stars {
+    font-size: 28px; /* Larger touch targets */
+    display: flex;
+    gap: 8px;
+}
+
+.stars span {
+    padding: 5px; /* Larger touch area */
+}
+
+/* Improve button touch targets */
+.bottom-add-btn,
+.add-cafe-btn {
+    min-height: 44px;
+    padding: 12px 24px;
+    width: 100%;
+    max-width: 300px;
+    margin: 10px auto;
+}
+
+/* Custom scrollbar for modal */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+/* Larger close button for better touch target */
+.close {
+    font-size: 32px;
+    padding: 10px;
+}
+
+/* Input field improvements */
+input[type="text"] {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    padding: 10px;
+    margin: 5px 0;
+}
+
+/* Media queries for larger devices */
+@media screen and (min-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 2.5em;
+    }
+
+    .cafe-item {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .modal-content {
+        margin: 50px auto;
+        max-width: 500px;
+        padding: 20px;
+    }
+
+    .bottom-add-btn,
+    .add-cafe-btn {
+        width: auto;
+    }
+}
+
+/* Prevent text selection on buttons and interactive elements */
+.stars span,
+.bottom-add-btn,
+.add-cafe-btn,
+.close {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+/* Add smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Improve modal behavior on mobile */
+@media screen and (max-height: 600px) {
+    .modal-content {
+        margin: 10px;
+        max-height: 85vh;
+    }
+}
+
+/* Better handling of viewport height on mobile browsers */
+.modal {
+    height: -webkit-fill-available;
+    height: 100vh;
+}
+
+/* Add touch feedback */
+@media (hover: none) {
+    .cafe-item:active {
+        background-color: #f5f5f5;
+    }
+
+    .bottom-add-btn:active,
+    .add-cafe-btn:active {
+        opacity: 0.8;
+    }
+}
+
+
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>☕ Work From Cafe/Hyderabad</h1>
+            <div class="explanation">
+                <ul>
+                    <li>Add your favorite cafe using the "Add New Cafe" button</li>
+                    <li>Rate cafes on WiFi, seating, power outlets, ambience, and food</li>
+                    <li>Your rating combines with existing ratings to update the cafe's score</li>
+                    <li>Cafes are ranked automatically - highest rated appear first</li>
+                    <li>Click any cafe to add or update your rating</li>
+                </ul>
+                <div class="note">
+                    Note: Each new rating adjusts the cafe's overall score, which may change its position in the list.
+                </div>
+            </div>
+        </header>
+
+        <ul class="cafe-list" id="cafeList">
+            <!-- Cafes will be dynamically added here -->
+        </ul>
+        
+        <div class="button-container">
+            <button class="bottom-add-btn" onclick="showAddCafeModal()">+ Add New Cafe</button>
+        </div>
+    </div>
+
+    <!-- Add Cafe Modal -->
+    <div id="addCafeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addCafeModal')">&times;</span>
+            <h2>Add New Cafe</h2>
+            <div class="rating-group">
+                <label>Cafe Name:</label>
+                <input type="text" id="newCafeName" style="width: 100%; padding: 5px;">
+            </div>
+            <button class="add-cafe-btn" onclick="addCafe()">Add</button>
+        </div>
+    </div>
+
+    <!-- Rate Cafe Modal -->
+    <div id="rateCafeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('rateCafeModal')">&times;</span>
+            <h2 id="rateCafeName"></h2>
+            <div class="rating-group">
+                <label>WiFi Quality:</label>
+                <div class="stars" id="wifiRating">
+                    <span onclick="setRating('wifi', 1)">★</span>
+                    <span onclick="setRating('wifi', 2)">★</span>
+                    <span onclick="setRating('wifi', 3)">★</span>
+                    <span onclick="setRating('wifi', 4)">★</span>
+                    <span onclick="setRating('wifi', 5)">★</span>
+                </div>
+            </div>
+            <div class="rating-group">
+                <label>Seating Comfort:</label>
+                <div class="stars" id="seatingRating">
+                    <span onclick="setRating('seating', 1)">★</span>
+                    <span onclick="setRating('seating', 2)">★</span>
+                    <span onclick="setRating('seating', 3)">★</span>
+                    <span onclick="setRating('seating', 4)">★</span>
+                    <span onclick="setRating('seating', 5)">★</span>
+                </div>
+            </div>
+            <div class="rating-group">
+                <label>Power Outlets:</label>
+                <div class="stars" id="powerRating">
+                    <span onclick="setRating('power', 1)">★</span>
+                    <span onclick="setRating('power', 2)">★</span>
+                    <span onclick="setRating('power', 3)">★</span>
+                    <span onclick="setRating('power', 4)">★</span>
+                    <span onclick="setRating('power', 5)">★</span>
+                </div>
+            </div>
+            <div class="rating-group">
+                <label>Ambience:</label>
+                <div class="stars" id="ambienceRating">
+                    <span onclick="setRating('ambience', 1)">★</span>
+                    <span onclick="setRating('ambience', 2)">★</span>
+                    <span onclick="setRating('ambience', 3)">★</span>
+                    <span onclick="setRating('ambience', 4)">★</span>
+                    <span onclick="setRating('ambience', 5)">★</span>
+                </div>
+            </div>
+            <div class="rating-group">
+                <label>Food & Beverage Options:</label>
+                <div class="stars" id="foodRating">
+                    <span onclick="setRating('food', 1)">★</span>
+                    <span onclick="setRating('food', 2)">★</span>
+                    <span onclick="setRating('food', 3)">★</span>
+                    <span onclick="setRating('food', 4)">★</span>
+                    <span onclick="setRating('food', 5)">★</span>
+                </div>
+            </div>
+            <button class="add-cafe-btn" onclick="submitRating()">Submit Rating</button>
+        </div>
+    </div>
+
+    <script>
+        // JSONBin configuration
+        const JSONBIN_API_KEY = '$2a$10$wcos.3S9pfwCP.yv/d/WgumoqaqGYGjX.iVHoZU2uuC0GnTONhEE2';
+        const JSONBIN_BIN_ID = '67836330ad19ca34f8ebc152';
+        const JSONBIN_API_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+        let cafes = [];
+        let currentRatings = {
+            wifi: 0,
+            seating: 0,
+            power: 0,
+            ambience: 0,
+            food: 0
+        };
+        let selectedCafeIndex = -1;
+
+
+
+// Load initial data
+async function loadCafes() {
+    try {
+        const response = await fetch(JSONBIN_API_URL, {
+            headers: {
+                'X-Master-Key': JSONBIN_API_KEY
+            }
+        });
+        const data = await response.json();
+        cafes = data.record.cafes || [];
+        updateCafeList();
+    } catch (error) {
+        console.error('Error loading cafes:', error);
+        cafes = [];
+    }
+}
+
+// Save data to JSONBin
+async function saveCafes() {
+    try {
+        await fetch(JSONBIN_API_URL, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': JSONBIN_API_KEY
+            },
+            body: JSON.stringify({ cafes: cafes })
+        });
+    } catch (error) {
+        console.error('Error saving cafes:', error);
+    }
+}
+
+
+
+
+        function showAddCafeModal() {
+            document.getElementById('addCafeModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            resetRatings();
+        }
+
+        function addCafe() {
+            const name = document.getElementById('newCafeName').value.trim();
+            if (name) {
+                cafes.push({
+                    name,
+                    ratings: [],
+                    averageRating: 0
+                });
+                saveCafes();
+                updateCafeList();
+                closeModal('addCafeModal');
+                document.getElementById('newCafeName').value = '';
+            }
+        }
+
+        function showRateCafeModal(index) {
+            selectedCafeIndex = index;
+            const cafe = cafes[index];
+            document.getElementById('rateCafeName').textContent = cafe.name;
+            document.getElementById('rateCafeModal').style.display = 'block';
+            resetRatings();
+        }
+
+        function setRating(type, rating) {
+            currentRatings[type] = rating;
+            updateStars(type, rating);
+        }
+
+        function updateStars(type, rating) {
+            const stars = document.getElementById(`${type}Rating`).children;
+            for (let i = 0; i < stars.length; i++) {
+                stars[i].style.color = i < rating ? '#FFD700' : '#ddd';
+            }
+        }
+
+        function resetRatings() {
+            currentRatings = {
+                wifi: 0,
+                seating: 0,
+                power: 0,
+                ambience: 0,
+                food: 0
+            };
+            ['wifi', 'seating', 'power', 'ambience', 'food'].forEach(type => {
+                updateStars(type, 0);
+            });
+        }
+
+        function submitRating() {
+            if (selectedCafeIndex === -1) return;
+
+            const totalRating = Object.values(currentRatings).reduce((a, b) => a + b, 0) / 5;
+            cafes[selectedCafeIndex].ratings.push(currentRatings);
+            
+            // Calculate new average
+            const ratings = cafes[selectedCafeIndex].ratings;
+            cafes[selectedCafeIndex].averageRating = ratings.reduce((sum, rating) => {
+                return sum + Object.values(rating).reduce((a, b) => a + b, 0) / 5;
+            }, 0) / ratings.length;
+
+            saveCafes();
+            updateCafeList();
+            closeModal('rateCafeModal');
+        }
+
+        function updateCafeList() {
+            const list = document.getElementById('cafeList');
+            list.innerHTML = '';
+            
+            // Sort cafes by average rating
+            cafes.sort((a, b) => b.averageRating - a.averageRating);
+
+            cafes.forEach((cafe, index) => {
+                const li = document.createElement('li');
+                li.className = 'cafe-item';
+                li.onclick = () => showRateCafeModal(index);
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'cafe-name';
+                nameSpan.textContent = cafe.name;
+                
+                const ratingSpan = document.createElement('span');
+                ratingSpan.className = 'cafe-rating';
+                ratingSpan.textContent = cafe.averageRating ? 
+                    `${cafe.averageRating.toFixed(1)} ★` : 'No ratings yet';
+                
+                li.appendChild(nameSpan);
+                li.appendChild(ratingSpan);
+                list.appendChild(li);
+            });
+        }
+
+        // Initialize the application
+        loadCafes();
+    </script>
+</body>
+</html>
