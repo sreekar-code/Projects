@@ -546,39 +546,64 @@ if (!sub.notificationSent && dueSoon) {
 class NotificationService {
     constructor() {
         this.webhookUrl = 'https://script.google.com/macros/s/AKfycbz5WHsc9b0Eg48IvGQPD_qa48cv4Br3nwCas2MxMbI9X2NsQUir-rJcL6Tmh_r8RFP3jA/exec';
+        this.timeoutDuration = 10000; // 10 seconds timeout
     }
 
     sendNotification(subscription, status) {
+        console.log('Attempting to send notification for:', subscription.name, status);
+
         // Create a script element
         const script = document.createElement('script');
-                console.log('Attempting to send notification for:', subscription.name, status);
-
         
         // Create a unique callback name
         const callbackName = 'callback_' + Math.random().toString(36).substr(2, 9);
         
-        // Add the callback function to window
-        window[callbackName] = (response) => {
-                        console.log('Notification response received:', response);
+        // Create a promise to handle the response
+        return new Promise((resolve, reject) => {
+            // Set timeout to cleanup if no response
+            const timeoutId = setTimeout(() => {
+                cleanup();
+                resolve({ success: false, error: 'Request timed out' });
+            }, this.timeoutDuration);
 
-            // Clean up
-            delete window[callbackName];
-            document.body.removeChild(script);
-        };
+            // Cleanup function
+            const cleanup = () => {
+                if (script.parentNode) {
+                    script.parentNode.removeChild(script);
+                }
+                delete window[callbackName];
+                clearTimeout(timeoutId);
+            };
 
-        // Add parameters to URL
-        const params = new URLSearchParams({
-            callback: callbackName,
-            serviceName: subscription.name,
-            status: status,
-            date: subscription.endDate,
-            cost: subscription.cost
+            // Add the callback function to window
+            window[callbackName] = (response) => {
+                console.log('Notification response received:', response);
+                cleanup();
+                resolve(response);
+            };
+
+            // Add parameters to URL
+            const params = new URLSearchParams({
+                callback: callbackName,
+                serviceName: subscription.name,
+                status: status,
+                date: subscription.endDate,
+                cost: subscription.cost
+            });
+
+            // Set the script source
+            script.src = `${this.webhookUrl}?${params.toString()}`;
+            console.log('Making request to:', script.src);
+            
+            // Handle script load error
+            script.onerror = () => {
+                cleanup();
+                resolve({ success: false, error: 'Script failed to load' });
+            };
+
+            // Add script to document
+            document.body.appendChild(script);
         });
-
-        // Set the script source and add it to document
-        script.src = `${this.webhookUrl}?${params.toString()}`;
-                console.log('Making request to:', script.src);
-        document.body.appendChild(script);
     }
 }
         
