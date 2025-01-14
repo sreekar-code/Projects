@@ -390,159 +390,6 @@
     </div>
 
     <script>
-        class SubscriptionTracker {
-            constructor() {
-                this.subscriptions = JSON.parse(localStorage.getItem('subscriptions')) || [];
-                this.form = document.getElementById('subscriptionForm');
-                this.list = document.getElementById('subscriptionsList');
-                this.notificationService = new NotificationService();  // Add this line
-
-                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-                this.updateUI();
-            }
-
-            calculateEndDate(startDate, billingCycle) {
-                const start = new Date(startDate);
-                const today = new Date();
-                
-                // For monthly subscriptions
-                if (billingCycle === 'monthly') {
-                    const endDate = new Date(startDate);
-                    endDate.setMonth(endDate.getMonth() + 1);
-                    endDate.setDate(endDate.getDate() - 1);
-                    return endDate.toISOString().split('T')[0];
-                } else {
-                    // For yearly subscriptions
-                    const endDate = new Date(startDate);
-                    endDate.setFullYear(endDate.getFullYear() + 1);
-                    endDate.setDate(endDate.getDate() - 1);
-                    return endDate.toISOString().split('T')[0];
-                }
-            }
-
-            isSubscriptionEnded(endDate) {
-                const end = new Date(endDate);
-                const today = new Date();
-                return end < today;
-            }
-
-            isSubscriptionExpired(endDate) {
-                const end = new Date(endDate);
-                const today = new Date();
-                return end < today;
-            }
-
-            handleSubmit(e) {
-                e.preventDefault();
-                
-                const startDate = document.getElementById('startDate').value;
-                const billingCycle = document.getElementById('billingCycle').value;
-                const endDate = this.calculateEndDate(startDate, billingCycle);
-                
-                // Check if subscription is expired
-                if (this.isSubscriptionExpired(endDate)) {
-                    showExpiredModal();
-                    return;
-                }
-
-                const subscription = {
-                    id: Date.now(),
-                    name: document.getElementById('serviceName').value,
-                    cost: parseFloat(document.getElementById('cost').value),
-                    billingCycle: billingCycle,
-                    startDate: startDate,
-                    endDate: endDate
-                };
-
-                this.subscriptions.push(subscription);
-                this.saveToLocalStorage();
-                this.updateUI();
-                this.form.reset();
-            }
-
-            deleteSubscription(id) {
-                this.subscriptions = this.subscriptions.filter(sub => sub.id !== id);
-                this.saveToLocalStorage();
-                this.updateUI();
-            }
-
-            calculateMonthlyTotal() {
-                return this.subscriptions.reduce((total, sub) => {
-                    const cost = sub.cost;
-                    return total + (sub.billingCycle === 'annual' ? cost / 12 : cost);
-                }, 0);
-            }
-
-            isDueSoon(date) {
-                const endDate = new Date(date);
-                const today = new Date();
-                const diffTime = endDate - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                return diffDays <= 7 && diffDays >= 0;
-            }
-
-            saveToLocalStorage() {
-                localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
-            }
-
-            updateUI() {
-                document.getElementById('monthlyTotal').textContent = 
-                    `₹${this.calculateMonthlyTotal().toFixed(2)}`;
-                document.getElementById('totalSubscriptions').textContent = 
-                    this.subscriptions.length;
-
-                this.list.innerHTML = '';
-                this.subscriptions.forEach(sub => {
-                    const isEnded = this.isSubscriptionEnded(sub.endDate);
-                    const dueSoon = !isEnded && this.isDueSoon(sub.endDate);
-
-if (!sub.notificationSent && dueSoon) {
-                this.notificationService.sendNotification(sub, 'renewal');
-                sub.notificationSent = true;
-                this.saveToLocalStorage();
-            }
-            
-            if (!sub.expiryNotificationSent && isEnded) {
-                this.notificationService.sendNotification(sub, 'expiry');
-                sub.expiryNotificationSent = true;
-                this.saveToLocalStorage();
-            }
-                    
-                    const div = document.createElement('div');
-                    div.className = `subscription-item ${dueSoon ? 'due-soon' : ''}`;
-                    
-                    div.innerHTML = `
-                        <div class="subscription-info">
-                            <h3>${sub.name}</h3>
-                            <p>₹${sub.cost} / ${sub.billingCycle}</p>
-                            <p>Started: ${new Date(sub.startDate).toLocaleDateString()}</p>
-                      <p>${isEnded ? 'Subscription expired on' : 'Expires'}: ${new Date(sub.endDate).toLocaleDateString()}</p>
-                        </div>
-                        ${dueSoon ? '<div class="renewal-badge">Renew Soon</div>' : ''}
-                        <div class="subscription-actions">
-                            <button class="delete-btn" onclick="tracker.deleteSubscription(${sub.id})">
-                                Remove
-                            </button>
-                        </div>
-                    `;
-                    
-                    this.list.appendChild(div);
-                });
-            }
-        }
-
-        // Modal functions
-        function showExpiredModal() {
-            document.getElementById('expiredModal').style.display = 'flex';
-        }
-
-        function closeExpiredModal() {
-            document.getElementById('expiredModal').style.display = 'none';
-        }
-
-        // Initialize the tracker
-        const tracker = new SubscriptionTracker();
-
 class NotificationService {
     constructor() {
         this.webhookUrl = 'https://script.google.com/macros/s/AKfycbz5WHsc9b0Eg48IvGQPD_qa48cv4Br3nwCas2MxMbI9X2NsQUir-rJcL6Tmh_r8RFP3jA/exec';
@@ -606,13 +453,159 @@ class NotificationService {
         });
     }
 }
+
+class SubscriptionTracker {
+    constructor() {
+        this.subscriptions = JSON.parse(localStorage.getItem('subscriptions')) || [];
+        this.form = document.getElementById('subscriptionForm');
+        this.list = document.getElementById('subscriptionsList');
+        this.notificationService = new NotificationService();
+
+        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+        this.updateUI();
+    }
+
+    calculateEndDate(startDate, billingCycle) {
+        const start = new Date(startDate);
+        const today = new Date();
         
+        // For monthly subscriptions
+        if (billingCycle === 'monthly') {
+            const endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + 1);
+            endDate.setDate(endDate.getDate() - 1);
+            return endDate.toISOString().split('T')[0];
+        } else {
+            // For yearly subscriptions
+            const endDate = new Date(startDate);
+            endDate.setFullYear(endDate.getFullYear() + 1);
+            endDate.setDate(endDate.getDate() - 1);
+            return endDate.toISOString().split('T')[0];
+        }
+    }
 
-// Initialize notification service
-const notificationService = new NotificationService();
+    isSubscriptionEnded(endDate) {
+        const end = new Date(endDate);
+        const today = new Date();
+        return end < today;
+    }
 
+    isSubscriptionExpired(endDate) {
+        const end = new Date(endDate);
+        const today = new Date();
+        return end < today;
+    }
 
+    handleSubmit(e) {
+        e.preventDefault();
         
+        const startDate = document.getElementById('startDate').value;
+        const billingCycle = document.getElementById('billingCycle').value;
+        const endDate = this.calculateEndDate(startDate, billingCycle);
+        
+        // Check if subscription is expired
+        if (this.isSubscriptionExpired(endDate)) {
+            showExpiredModal();
+            return;
+        }
+
+        const subscription = {
+            id: Date.now(),
+            name: document.getElementById('serviceName').value,
+            cost: parseFloat(document.getElementById('cost').value),
+            billingCycle: billingCycle,
+            startDate: startDate,
+            endDate: endDate
+        };
+
+        this.subscriptions.push(subscription);
+        this.saveToLocalStorage();
+        this.updateUI();
+        this.form.reset();
+    }
+
+    deleteSubscription(id) {
+        this.subscriptions = this.subscriptions.filter(sub => sub.id !== id);
+        this.saveToLocalStorage();
+        this.updateUI();
+    }
+
+    calculateMonthlyTotal() {
+        return this.subscriptions.reduce((total, sub) => {
+            const cost = sub.cost;
+            return total + (sub.billingCycle === 'annual' ? cost / 12 : cost);
+        }, 0);
+    }
+
+    isDueSoon(date) {
+        const endDate = new Date(date);
+        const today = new Date();
+        const diffTime = endDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays <= 7 && diffDays >= 0;
+    }
+
+    saveToLocalStorage() {
+        localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
+    }
+
+    updateUI() {
+        document.getElementById('monthlyTotal').textContent = 
+            `₹${this.calculateMonthlyTotal().toFixed(2)}`;
+        document.getElementById('totalSubscriptions').textContent = 
+            this.subscriptions.length;
+
+        this.list.innerHTML = '';
+        this.subscriptions.forEach(sub => {
+            const isEnded = this.isSubscriptionEnded(sub.endDate);
+            const dueSoon = !isEnded && this.isDueSoon(sub.endDate);
+
+            if (!sub.notificationSent && dueSoon) {
+                this.notificationService.sendNotification(sub, 'renewal');
+                sub.notificationSent = true;
+                this.saveToLocalStorage();
+            }
+            
+            if (!sub.expiryNotificationSent && isEnded) {
+                this.notificationService.sendNotification(sub, 'expiry');
+                sub.expiryNotificationSent = true;
+                this.saveToLocalStorage();
+            }
+                    
+            const div = document.createElement('div');
+            div.className = `subscription-item ${dueSoon ? 'due-soon' : ''}`;
+            
+            div.innerHTML = `
+                <div class="subscription-info">
+                    <h3>${sub.name}</h3>
+                    <p>₹${sub.cost} / ${sub.billingCycle}</p>
+                    <p>Started: ${new Date(sub.startDate).toLocaleDateString()}</p>
+                    <p>${isEnded ? 'Subscription expired on' : 'Expires'}: ${new Date(sub.endDate).toLocaleDateString()}</p>
+                </div>
+                ${dueSoon ? '<div class="renewal-badge">Renew Soon</div>' : ''}
+                <div class="subscription-actions">
+                    <button class="delete-btn" onclick="tracker.deleteSubscription(${sub.id})">
+                        Remove
+                    </button>
+                </div>
+            `;
+            
+            this.list.appendChild(div);
+        });
+    }
+}
+
+// Modal functions
+function showExpiredModal() {
+    document.getElementById('expiredModal').style.display = 'flex';
+}
+
+function closeExpiredModal() {
+    document.getElementById('expiredModal').style.display = 'none';
+}
+
+// Initialize the tracker
+const tracker = new SubscriptionTracker();
     </script>
 </body>
 </html>
