@@ -529,33 +529,41 @@
         // Initialize the tracker
         const tracker = new SubscriptionTracker();
 
-
-        
 class NotificationService {
     constructor() {
-        // Replace with your Google Apps Script Web App URL
         this.webhookUrl = 'https://script.google.com/macros/s/AKfycbw84O9ZIhjm97rARURM-sYfmu5Qf7ToKS1CakEedHM13kI6hh3ebQTkepgTWSpE2uybJA/exec';
     }
 
-    async sendNotification(subscription, status) {
-        try {
-            await fetch(this.webhookUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    serviceName: subscription.name,
-                    status: status,
-                    date: subscription.endDate,
-                    cost: subscription.cost
-                })
-            });
-        } catch (error) {
-            console.error('Error sending notification:', error);
-        }
+    sendNotification(subscription, status) {
+        // Create a script element
+        const script = document.createElement('script');
+        
+        // Create a unique callback name
+        const callbackName = 'callback_' + Math.random().toString(36).substr(2, 9);
+        
+        // Add the callback function to window
+        window[callbackName] = (response) => {
+            console.log('Notification sent:', response);
+            // Clean up
+            delete window[callbackName];
+            document.body.removeChild(script);
+        };
+
+        // Add parameters to URL
+        const params = new URLSearchParams({
+            callback: callbackName,
+            serviceName: subscription.name,
+            status: status,
+            date: subscription.endDate,
+            cost: subscription.cost
+        });
+
+        // Set the script source and add it to document
+        script.src = `${this.webhookUrl}?${params.toString()}`;
+        document.body.appendChild(script);
     }
 }
+        
 
 // Initialize notification service
 const notificationService = new NotificationService();
