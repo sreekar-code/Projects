@@ -528,6 +528,46 @@
 
         // Initialize the tracker
         const tracker = new SubscriptionTracker();
+
+
+        
+class NotificationService {
+    constructor() {
+        // Replace with your Google Apps Script Web App URL
+        this.webhookUrl = 'YOUR_WEBAPP_URL';
+    }
+
+    async sendNotification(subscription, status) {
+        try {
+            await fetch(this.webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    serviceName: subscription.name,
+                    status: status,
+                    date: subscription.endDate,
+                    cost: subscription.cost
+                })
+            });
+        } catch (error) {
+            console.error('Error sending notification:', error);
+        }
+    }
+}
+
+// Initialize notification service
+const notificationService = new NotificationService();
+
+// Add this inside your SubscriptionTracker's updateUI method, in the forEach loop:
+if (dueSoon) {
+    notificationService.sendNotification(sub, 'renewal');
+}
+if (isEnded) {
+    notificationService.sendNotification(sub, 'expiry');
+}
+        
     </script>
 </body>
 </html>
