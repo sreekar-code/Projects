@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f0f2f5;
+            padding: 20px;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2d3748;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        .overview-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card h3 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .card p {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        #subscriptionForm {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            margin-bottom: 5px;
+            color: #4a5568;
+            font-size: 0.9em;
+        }
+
+        input, select {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: #f8fafc;
+            transition: border-color 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        button {
+            background: #60a5fa;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            max-width: 200px;
+            margin: 0 auto;
+            display: block;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background: #3b82f6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .subscription-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+
+        .subscription-item:hover {
+            transform: translateX(2px);
+        }
+
+        .subscription-info h3 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .subscription-info p {
+            color: #4a5568;
+            font-size: 0.95em;
+            margin-bottom: 4px;
+        }
+
+        .due-soon {
+            border-left: 4px solid #f59e0b;
+            background: #fffbeb;
+        }
+
+        .renewal-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: #f59e0b;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subscription-info {
+            flex: 1;
+        }
+
+        .subscription-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .delete-btn:hover {
+            background: #fecaca;
+            transform: translateY(-1px);
+        }
+
+        .delete-btn span {
+            font-size: 1.1em;
+        }
+
+/* Add these media queries in your existing <style> tag, at the bottom of all other styles */
+
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 10px;
+        margin: 0 10px;
+    }
+
+    h1 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+
+    .overview-cards {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .form-group {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .subscription-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px;
+    }
+
+    .subscription-info {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .subscription-actions {
+        width: 100%;
+    }
+
+    .delete-btn {
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .renewal-badge {
+        position: relative;
+        top: 0;
+        right: 0;
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+
+    input, select, button {
+        width: 100%;
+        max-width: none;
+    }
+
+    /* Adjust text sizes for better readability on mobile */
+    .subscription-info h3 {
+        font-size: 1.2em;
+    }
+
+    .subscription-info p {
+        font-size: 0.9em;
+    }
+}
+
+/* Add additional optimization for very small screens */
+@media screen and (max-width: 380px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 5px;
+        margin: 0;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    .card p {
+        font-size: 24px;
+    }
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Subscription Tracker</h1>
+        
+        <div class="overview-cards">
+            <div class="card">
+                <h3>Monthly Total</h3>
+                <p id="monthlyTotal">₹0.00</p>
+            </div>
+            <div class="card">
+                <h3>Active Subscriptions</h3>
+                <p id="totalSubscriptions">0</p>
+            </div>
+        </div>
+
+        <form id="subscriptionForm">
+            <div class="form-group">
+                <div class="input-group">
+                    <label for="serviceName">Service Name</label>
+                    <input type="text" id="serviceName" required>
+                </div>
+                <div class="input-group">
+                    <label for="cost">Cost (₹)</label>
+                    <input type="number" id="cost" step="0.01" required>
+                </div>
+                <div class="input-group">
+                    <label for="billingCycle">Billing Cycle</label>
+                    <select id="billingCycle">
+                        <option value="monthly">Monthly</option>
+                        <option value="annual">Annual</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" required>
+                </div>
+            </div>
+            <button type="submit">Add Subscription</button>
+        </form>
+
+        <div id="subscriptionsList">
+            <!-- Subscriptions will be added here dynamically -->
+        </div>
+    </div>
+
+    <script>
+        class SubscriptionTracker {
+            constructor() {
+                this.subscriptions = JSON.parse(localStorage.getItem('subscriptions')) || [];
+                this.form = document.getElementById('subscriptionForm');
+                this.list = document.getElementById('subscriptionsList');
+                
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+                this.updateUI();
+            }
+
+            calculateNextRenewal(startDate, billingCycle) {
+    const start = new Date(startDate);
+    const today = new Date();
+    
+    let nextRenewal = new Date(startDate);
+    
+    if (billingCycle === 'monthly') {
+        // Get the day of the month from the start date
+        const renewalDay = start.getDate();
+        
+        // Set to current month
+        nextRenewal = new Date(today.getFullYear(), today.getMonth(), renewalDay);
+        
+        // If today is past the renewal day of this month, move to next month
+        if (today.getDate() >= renewalDay) {
+            nextRenewal.setMonth(nextRenewal.getMonth() + 1);
+        }
+    } else {
+        // For annual billing
+        nextRenewal.setFullYear(start.getFullYear() + Math.ceil((today - start) / (365 * 24 * 60 * 60 * 1000)));
+    }
+    
+    return nextRenewal.toISOString().split('T')[0];
+}
+
+            handleSubmit(e) {
+                e.preventDefault();
+                
+                const startDate = document.getElementById('startDate').value;
+                const billingCycle = document.getElementById('billingCycle').value;
+                
+                const subscription = {
+                    id: Date.now(),
+                    name: document.getElementById('serviceName').value,
+                    cost: parseFloat(document.getElementById('cost').value),
+                    billingCycle: billingCycle,
+                    startDate: startDate,
+                    nextBilling: this.calculateNextRenewal(startDate, billingCycle)
+                };
+
+                this.subscriptions.push(subscription);
+                this.saveToLocalStorage();
+                this.updateUI();
+                this.form.reset();
+            }
+
+            deleteSubscription(id) {
+                this.subscriptions = this.subscriptions.filter(sub => sub.id !== id);
+                this.saveToLocalStorage();
+                this.updateUI();
+            }
+
+            calculateMonthlyTotal() {
+                return this.subscriptions.reduce((total, sub) => {
+                    const cost = sub.cost;
+                    return total + (sub.billingCycle === 'annual' ? cost / 12 : cost);
+                }, 0);
+            }
+
+            isDueSoon(date) {
+                const dueDate = new Date(date);
+                const today = new Date();
+                const diffTime = dueDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays <= 7 && diffDays >= 0;
+            }
+
+            saveToLocalStorage() {
+                localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
+            }
+
+            updateUI() {
+                document.getElementById('monthlyTotal').textContent = 
+                    `₹${this.calculateMonthlyTotal().toFixed(2)}`;
+                document.getElementById('totalSubscriptions').textContent = 
+                    this.subscriptions.length;
+
+                this.list.innerHTML = '';
+                this.subscriptions.forEach(sub => {
+                    const dueSoon = this.isDueSoon(sub.nextBilling);
+                    const div = document.createElement('div');
+                    div.className = `subscription-item ${dueSoon ? 'due-soon' : ''}`;
+                    
+                    div.innerHTML = `
+                        <div class="subscription-info">
+                            <h3>${sub.name}</h3>
+                            <p>₹${sub.cost} / ${sub.billingCycle}</p>
+                            <p>Started: ${new Date(sub.startDate).toLocaleDateString()}</p>
+                            <p>Next renewal: ${new Date(sub.nextBilling).toLocaleDateString()}</p>
+                        </div>
+                        ${dueSoon ? '<div class="renewal-badge">Renewal Soon</div>' : ''}
+                        <div class="subscription-actions">
+                            <button class="delete-btn" onclick="tracker.deleteSubscription(${sub.id})">
+    Remove
+</button>
+                        </div>
+                    `;
+                    
+                    this.list.appendChild(div);
+                });
+            }
+        }
+
+        // Initialize the tracker
+        const tracker = new SubscriptionTracker();
+    </script>
+</body>
+</html>
