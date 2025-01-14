@@ -504,7 +504,7 @@
                             <p>Started: ${new Date(sub.startDate).toLocaleDateString()}</p>
                       <p>${isEnded ? 'Subscription expired on' : 'Expires'}: ${new Date(sub.endDate).toLocaleDateString()}</p>
                         </div>
-                        ${dueSoon ? '<div class="renewal-badge">Renewal Soon</div>' : ''}
+                        ${dueSoon ? '<div class="renewal-badge">Renew Soon</div>' : ''}
                         <div class="subscription-actions">
                             <button class="delete-btn" onclick="tracker.deleteSubscription(${sub.id})">
                                 Remove
