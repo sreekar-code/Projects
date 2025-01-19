@@ -5,67 +5,184 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Markdown to HTML Converter</title>
     <style>
+        /* Reset and Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: system-ui, -apple-system, sans-serif;
             line-height: 1.6;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
+            padding: 12px;
             background-color: #f5f5f5;
             color: #333;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
             background-color: white;
-            padding: 2rem;
+            padding: 1rem;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 100%;
+            overflow: hidden;
         }
 
         h1 {
             color: #2c3e50;
-            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            padding: 0.5rem 0;
+            margin: 0;
+        }
+
+        .editor-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
         }
 
         .input-area, .output-area {
             width: 100%;
-            min-height: 300px;
-            padding: 1rem;
-            margin: 1rem 0;
+            padding: 0.875rem;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 16px;
             background-color: #fff;
-            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-family: -apple-system-monospace, 'Menlo', monospace;
+            resize: none;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .output-area {
             background-color: #f8f9fa;
             white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            padding: 8px 0;
+            position: sticky;
+            bottom: 0;
+            background: white;
         }
 
         button {
+            flex: 1;
             background-color: #3498db;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px;
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.2s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        button:hover {
+        button:active {
             background-color: #2980b9;
+            transform: translateY(1px);
         }
 
         .copy-button {
             background-color: #27ae60;
-            margin-left: 10px;
         }
 
-        .copy-button:hover {
+        .copy-button:active {
             background-color: #219a52;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 8px;
+            padding: 8px 0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 8px;
+            background: #eee;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 8px 0;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .toolbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .toolbar button {
+            padding: 8px 12px;
+            white-space: nowrap;
+            flex: 0 0 auto;
+            font-size: 14px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .toast.visible {
+            opacity: 1;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            .container {
+                padding: 12px;
+            }
+
+            h1 {
+                font-size: 1.25rem;
+            }
+
+            .input-area, .output-area {
+                padding: 12px;
+                font-size: 15px;
+            }
         }
     </style>
 </head>
@@ -73,15 +190,33 @@
     <div class="container">
         <h1>Markdown to HTML Converter</h1>
         
-        <textarea class="input-area" placeholder="Enter your Markdown text here..."></textarea>
+        <div class="toolbar">
+            <button onclick="insertMarkdown('**bold**')">Bold</button>
+            <button onclick="insertMarkdown('*italic*')">Italic</button>
+            <button onclick="insertMarkdown('[link](url)')">Link</button>
+            <button onclick="insertMarkdown('# ')">Heading</button>
+            <button onclick="insertMarkdown('- ')">List</button>
+            <button onclick="insertMarkdown('> ')">Quote</button>
+            <button onclick="insertMarkdown('`code`')">Code</button>
+        </div>
+
+        <div class="tab-container">
+            <button class="tab active" onclick="switchTab('edit')">Editor</button>
+            <button class="tab" onclick="switchTab('preview')">Preview</button>
+        </div>
         
-        <div>
+        <div class="editor-container">
+            <textarea class="input-area" placeholder="Enter your Markdown text here..."></textarea>
+            <pre class="output-area" style="display: none;"></pre>
+        </div>
+        
+        <div class="button-group">
             <button onclick="convertToHTML()">Convert to HTML</button>
             <button class="copy-button" onclick="copyToClipboard()">Copy HTML</button>
         </div>
-        
-        <pre class="output-area"></pre>
     </div>
+
+    <div class="toast" id="toast"></div>
 
     <script>
         // Store reference links
@@ -128,7 +263,7 @@
             
             // Reference-style links
             text = text.replace(/\[([^\]]+)\]\[([^\]]*)\]/g, (match, text, ref) => {
-                ref = ref || text; // Empty reference uses text as reference
+                ref = ref || text;
                 ref = ref.toLowerCase();
                 if (referenceLinks[ref]) {
                     const title = referenceLinks[ref].title 
@@ -136,7 +271,7 @@
                         : '';
                     return `<a href="${referenceLinks[ref].url}"${title}>${text}</a>`;
                 }
-                return match; // Keep original if reference not found
+                return match;
             });
             
             // Inline links with title
@@ -220,18 +355,15 @@
                 const content = line.trim().replace(/^([*+-]|\d+\.)\s+/, '');
 
                 if (currentIndent > indent) {
-                    // Deeper nesting
                     listStack.push({type: listType, indent: indent});
                     html += `<${isOrdered ? 'ol' : 'ul'}>\n<li>${processInlineMarkdown(content)}`;
                 } else if (currentIndent < indent && listStack.length > 0) {
-                    // Coming back out
                     while (listStack.length > 0 && currentIndent <= listStack[listStack.length - 1].indent) {
                         const list = listStack.pop();
                         html += `</li>\n</${list.type}>\n`;
                     }
                     html += `<li>${processInlineMarkdown(content)}`;
                 } else {
-                    // Same level
                     if (inList) {
                         html += `</li>\n<li>${processInlineMarkdown(content)}`;
                     } else {
@@ -244,7 +376,6 @@
                 listType = isOrdered ? 'ol' : 'ul';
             });
 
-            // Close any remaining lists
             if (inList) {
                 html += '</li>\n';
                 while (listStack.length > 0) {
@@ -263,14 +394,82 @@
             return div.innerHTML;
         }
 
+        function switchTab(tab) {
+            const inputArea = document.querySelector('.input-area');
+            const outputArea = document.querySelector('.output-area');
+            const tabs = document.querySelectorAll('.tab');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (tab === 'edit') {
+                inputArea.style.display = 'block';
+                outputArea.style.display = 'none';
+            } else {
+                convertToHTML();
+                inputArea.style.display = 'none';
+                outputArea.style.display = 'block';
+            }
+        }
+
+        function insertMarkdown(text) {
+            const textarea = document.querySelector('.input-area');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const value = textarea.value;
+            
+            textarea.value = value.substring(0, start) + text + value.substring(end);
+            textarea.focus();
+            
+            if (text === '[link](url)') {
+                textarea.setSelectionRange(start + 1, start + 5);
+            } else {
+                textarea.setSelectionRange(start + text.length, start + text.length);
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 2000);
+        }
+
         function copyToClipboard() {
             const output = document.querySelector('.output-area').textContent;
-            navigator.clipboard.writeText(output).then(() => {
-                alert('HTML copied to clipboard!');
+            
+            if (navigator.share) {
+                navigator.share({
+                    text: output
+                }).catch(err => {
+                    fallbackCopy(output);
+                });
+            } else {
+                fallbackCopy(output);
+}
+        }
+
+        function fallbackCopy(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!');
             }).catch(err => {
                 console.error('Failed to copy text: ', err);
+                showToast('Failed to copy');
             });
         }
+
+        // Auto-save functionality
+        const textarea = document.querySelector('.input-area');
+        textarea.value = localStorage.getItem('markdown-content') || '';
+
+        textarea.addEventListener('input', () => {
+            localStorage.setItem('markdown-content', textarea.value);
+        });
     </script>
 </body>
 </html>
+
+            
