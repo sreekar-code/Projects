@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Markdown to HTML Converter</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-area, .output-area {
+            width: 100%;
+            min-height: 300px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #fff;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+        }
+
+        .output-area {
+            background-color: #f8f9fa;
+            white-space: pre-wrap;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .copy-button {
+            background-color: #27ae60;
+            margin-left: 10px;
+        }
+
+        .copy-button:hover {
+            background-color: #219a52;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Markdown to HTML Converter</h1>
+        
+        <textarea class="input-area" placeholder="Enter your Markdown text here..."></textarea>
+        
+        <div>
+            <button onclick="convertToHTML()">Convert to HTML</button>
+            <button class="copy-button" onclick="copyToClipboard()">Copy HTML</button>
+        </div>
+        
+        <pre class="output-area"></pre>
+    </div>
+
+    <script>
+        // Store reference links
+        let referenceLinks = {};
+        
+        function convertToHTML() {
+            let input = document.querySelector('.input-area').value;
+            
+            // First pass: collect reference links
+            collectReferenceLinks(input);
+            
+            // Split into blocks and process
+            const blocks = input.split(/\n\n+/);
+            const html = blocks.map(processBlock).join('\n');
+            
+            document.querySelector('.output-area').textContent = html;
+        }
+
+        function collectReferenceLinks(text) {
+            referenceLinks = {};
+            const refLinkRegex = /^\s*\[([^\]]+)\]:\s*(\S+)(?:\s+"([^"]+)")?\s*$/gm;
+            let match;
+            
+            while ((match = refLinkRegex.exec(text)) !== null) {
+                const [, id, url, title] = match;
+                referenceLinks[id.toLowerCase()] = {
+                    url: url,
+                    title: title || ''
+                };
+            }
+        }
+
+        function processInlineMarkdown(text) {
+            // Strikethrough
+            text = text.replace(/~~(.*?)~~/g, '<del>$1</del>');
+            
+            // Bold
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
+            
+            // Italic
+            text = text.replace(/\b_([^_]+)_\b/g, '<em>$1</em>');
+            text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            
+            // Reference-style links
+            text = text.replace(/\[([^\]]+)\]\[([^\]]*)\]/g, (match, text, ref) => {
+                ref = ref || text; // Empty reference uses text as reference
+                ref = ref.toLowerCase();
+                if (referenceLinks[ref]) {
+                    const title = referenceLinks[ref].title 
+                        ? ` title="${referenceLinks[ref].title}"` 
+                        : '';
+                    return `<a href="${referenceLinks[ref].url}"${title}>${text}</a>`;
+                }
+                return match; // Keep original if reference not found
+            });
+            
+            // Inline links with title
+            text = text.replace(/\[([^\]]+)\]\(([^)]+)\s+"([^"]+)"\)/g, 
+                '<a href="$2" title="$3">$1</a>');
+            
+            // Regular inline links
+            text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+            
+            // Images with title
+            text = text.replace(/!\[([^\]]+)\]\(([^)]+)\s+"([^"]+)"\)/g, 
+                '<img src="$2" alt="$1" title="$3">');
+            
+            // Regular images
+            text = text.replace(/!\[([^\]]+)\]\(([^)]+)\)/g, 
+                '<img src="$2" alt="$1">');
+            
+            // Auto-links
+            text = text.replace(/<(https?:\/\/[^>]+)>/g, '<a href="$1">$1</a>');
+            text = text.replace(/(?<![\["'])(https?:\/\/\S+)(?![\]"'])/g, '<a href="$1">$1</a>');
+            
+            // Inline code
+            text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+            
+            return text;
+        }
+
+        function processBlock(block) {
+            block = block.trim();
+            if (!block) return '';
+
+            // Horizontal rules
+            if (block.match(/^([*-_])\1\1+$/)) {
+                return '<hr>\n';
+            }
+
+            // Code blocks
+            if (block.startsWith('```')) {
+                const lines = block.split('\n');
+                const language = lines[0].slice(3).trim();
+                const code = lines.slice(1, -1).join('\n');
+                return `<pre><code${language ? ` class="language-${language}"` : ''}>${escapeHTML(code)}</code></pre>\n`;
+            }
+
+            // Headings
+            const headingMatch = block.match(/^(#{1,6})\s+(.+)$/m);
+            if (headingMatch) {
+                const level = headingMatch[1].length;
+                const content = processInlineMarkdown(headingMatch[2].trim());
+                return `<h${level}>${content}</h${level}>\n`;
+            }
+
+            // Blockquotes
+            if (block.startsWith('>')) {
+                const content = block.split('\n')
+                    .map(line => line.replace(/^>\s?/, '').trim())
+                    .join('\n');
+                return `<blockquote>${processInlineMarkdown(content)}</blockquote>\n`;
+            }
+
+            // Lists
+            if (block.match(/^([*+-]|\d+\.)\s/m)) {
+                return processList(block);
+            }
+
+            // Regular paragraphs
+            return `<p>${processInlineMarkdown(block)}</p>\n`;
+        }
+
+        function processList(block) {
+            const lines = block.split('\n');
+            let html = '';
+            let inList = false;
+            let listType = '';
+            let indent = 0;
+            let listStack = [];
+
+            lines.forEach(line => {
+                const currentIndent = line.search(/\S/);
+                const isOrdered = /^\d+\./.test(line.trim());
+                const content = line.trim().replace(/^([*+-]|\d+\.)\s+/, '');
+
+                if (currentIndent > indent) {
+                    // Deeper nesting
+                    listStack.push({type: listType, indent: indent});
+                    html += `<${isOrdered ? 'ol' : 'ul'}>\n<li>${processInlineMarkdown(content)}`;
+                } else if (currentIndent < indent && listStack.length > 0) {
+                    // Coming back out
+                    while (listStack.length > 0 && currentIndent <= listStack[listStack.length - 1].indent) {
+                        const list = listStack.pop();
+                        html += `</li>\n</${list.type}>\n`;
+                    }
+                    html += `<li>${processInlineMarkdown(content)}`;
+                } else {
+                    // Same level
+                    if (inList) {
+                        html += `</li>\n<li>${processInlineMarkdown(content)}`;
+                    } else {
+                        html += `<${isOrdered ? 'ol' : 'ul'}>\n<li>${processInlineMarkdown(content)}`;
+                        inList = true;
+                    }
+                }
+
+                indent = currentIndent;
+                listType = isOrdered ? 'ol' : 'ul';
+            });
+
+            // Close any remaining lists
+            if (inList) {
+                html += '</li>\n';
+                while (listStack.length > 0) {
+                    const list = listStack.pop();
+                    html += `</${list.type}>\n`;
+                }
+                html += `</${listType}>\n`;
+            }
+
+            return html;
+        }
+
+        function escapeHTML(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function copyToClipboard() {
+            const output = document.querySelector('.output-area').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                alert('HTML copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
