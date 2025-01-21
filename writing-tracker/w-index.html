@@ -2,12 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Writing Progress Tracker</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#ff6b6b">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ff6b6b">
     <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -18,167 +23,195 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             padding: 2rem;
+            overflow-x: hidden;
         }
 
         .container {
             background: rgba(0, 0, 0, 0.2);
-            padding: 2rem;
-            border-radius: 15px;
+            padding: 3rem;
+            border-radius: 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             text-align: center;
-            max-width: 600px;
-            width: 100%;
+            max-width: 800px;
+            width: 90%;
+            backdrop-filter: blur(10px);
         }
 
         h1 {
-            font-size: 3rem;
-            margin-bottom: 2rem;
+            font-size: 4rem;
+            margin-bottom: 3rem;
             text-transform: uppercase;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 2px;
         }
 
         .input-group {
-            margin: 2rem 0;
+            margin: 3rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
         }
 
         input {
-            padding: 1rem;
-            font-size: 1.2rem;
+            padding: 1.25rem;
+            font-size: 1.4rem;
             border: none;
-            border-radius: 5px;
-            margin-right: 1rem;
-            width: 150px;
+            border-radius: 10px;
+            width: 200px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
         button {
-            padding: 1rem 2rem;
-            font-size: 1.2rem;
+            padding: 1.25rem 2.5rem;
+            font-size: 1.4rem;
             background: #7FB285;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            margin: 0 0.5rem;
+            transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+            margin: 0;
         }
 
         button:hover {
             background: #6a9870;
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
         .stats {
-            margin-top: 2rem;
-            padding: 2rem;
+            margin-top: 3rem;
+            padding: 2.5rem;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        .stats h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .total-words {
-            font-size: 2.5rem;
+            font-size: 3.5rem;
             font-weight: bold;
-            margin: 1rem 0;
+            margin: 1.5rem 0;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
         .total-words:hover {
             text-decoration: underline;
             opacity: 0.9;
+            transform: scale(1.05);
         }
 
         .edit-total {
-            margin-top: 1rem;
+            margin-top: 1.5rem;
             display: none;
             justify-content: center;
             align-items: center;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .permanent-motivation {
-            margin-top: 2rem;
-            font-size: 1rem;
+            margin-top: 3rem;
+            font-size: 1.2rem;
             font-style: italic;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
         }
 
-        .edit-button {
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-            opacity: 0.8;
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1.25rem;
+                margin: 0;
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+                margin-bottom: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+                gap: 0.75rem;
+                margin: 1rem 0;
+            }
+
+            input {
+                width: 100%;
+                padding: 0.75rem;
+                font-size: 1rem;
+                height: 40px;
+            }
+
+            button {
+                width: 100%;
+                padding: 0.75rem;
+                font-size: 1rem;
+                height: 40px;
+            }
+
+            .stats {
+                margin-top: 1rem;
+                padding: 1rem;
+            }
+
+            .stats h2 {
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
+            }
+
+            .total-words {
+                font-size: 1.75rem;
+            }
+
+            .edit-total {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            input[type="number"] {
+                font-size: 16px;
+            }
+
+            .permanent-motivation {
+                font-size: 0.9rem;
+                margin-top: 1.5rem;
+            }
         }
 
-        /* Mobile Optimization Styles */
-@media screen and (max-width: 480px) {
-    body {
-        padding: 1rem;
-    }
+        @media (hover: none) {
+            button:active {
+                background: #6a9870;
+                transform: translateY(1px);
+            }
 
-    .container {
-        padding: 1rem;
-        margin: 0;
-    }
+            .total-words:active {
+                opacity: 0.7;
+            }
 
-    h1 {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-    }
-
-    .input-group {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        margin: 1rem 0;
-    }
-
-    input {
-        width: 100%;
-        margin-right: 0;
-        font-size: 1rem;
-        padding: 0.8rem;
-        /* Improve touch target size */
-        min-height: 44px;
-    }
-
-    button {
-        width: 100%;
-        padding: 0.8rem;
-        margin: 0;
-        /* Improve touch target size */
-        min-height: 44px;
-    }
-
-    .stats {
-        margin-top: 1rem;
-        padding: 1rem;
-    }
-
-    .total-words {
-        font-size: 2rem;
-    }
-
-    .edit-total {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    /* Prevent zoom on input focus on iOS */
-    input[type="number"] {
-        font-size: 16px;
-    }
-}
-
-/* Add touch-friendly active states for mobile */
-@media (hover: none) {
-    button:active {
-        background: #6a9870;
-        transform: translateY(1px);
-    }
-
-    .total-words:active {
-        opacity: 0.7;
-    }
-}
+            input:focus, button:hover {
+                transform: none;
+                box-shadow: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -206,6 +239,16 @@
     </div>
 
     <script>
+        // Fix for mobile viewport height issues
+        function updateVH() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        
+        updateVH();
+        window.addEventListener('resize', updateVH);
+        window.addEventListener('orientationchange', updateVH);
+
         let totalWords = parseInt(localStorage.getItem('totalWords')) || 0;
         updateDisplay();
 
@@ -218,6 +261,7 @@
                 localStorage.setItem('totalWords', totalWords);
                 updateDisplay();
                 input.value = '';
+                input.blur(); // Hide mobile keyboard after submission
             }
         }
 
@@ -245,6 +289,7 @@
 
         function cancelEdit() {
             document.getElementById('editTotal').style.display = 'none';
+            document.getElementById('newTotal').blur(); // Hide mobile keyboard
         }
 
         // Allow Enter key to submit
@@ -259,15 +304,6 @@
                 updateTotal();
             }
         });
-
-        // Fix for mobile viewport height issues
-let vh = window.innerHeight * 0.01;
-document.documentElement.style.setProperty('--vh', `${vh}px`);
-
-window.addEventListener('resize', () => {
-    let vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-});
     </script>
 </body>
 </html>
